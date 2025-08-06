@@ -9,7 +9,8 @@ pip3 install -r requirements.txt
 #### 修改配置
 ```
 cp config.example.py config.py
-修改qbittorrent账号信息和上行限制配置
+
+vim config.py 修改qbittorrent账号信息和上行限制配置
 
 ```
 执行 (放在后台一直执行，也可以用supervisorctl 守护执行)
