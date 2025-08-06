@@ -137,7 +137,7 @@ if __name__ == '__main__':
     # 设置限速
     setUploadLimit()
     # updateLog()
-    schedule.every(1).minutes.do(updateLog)
+    schedule.every(10).seconds.do(updateLog)
     logger.info("程序执行中")
     while True:
         schedule.run_pending()  # 检查并执行待执行的任务
