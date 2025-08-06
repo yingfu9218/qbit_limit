@@ -6,6 +6,7 @@ import schedule
 import time
 from loguru import logger
 from config import Config
+import humanize
 
 
 c = Config
@@ -102,6 +103,8 @@ def updateLog():
                                                                                                               now,today))
         conn.commit()
         logger.info("更新今天数据：upload:%d,down:%d,deny_limit:%d,updated_at=%s" % (upload, down, deny_limit, now))
+        logger.info("今天上行流量：%s" % (humanize.naturalsize(upload, binary=True)))
+        logger.info("今天下行流量：%s" % (humanize.naturalsize(down, binary=True)))
 
         if deny_limit==1:
             denyUpload(up_rate_limit)
@@ -118,12 +121,13 @@ def updateLog():
 def isMonthUploadOver():
     monthFirstDay = datetime.now().strftime("%Y-%m-01")
     today = datetime.now().strftime("%Y-%m-%d")
-    c.execute("select sum(upload) from log where day_time BETWEEN '%s' and '%s'  limit 1" % (monthFirstDay, today))
+    c.execute("select sum(upload),sum(down) from log where day_time BETWEEN '%s' and '%s'  limit 1" % (monthFirstDay, today))
     row = c.fetchone()
     if row[0] == None:
         return False
     else:
-        logger.info("当月总上行流量：%s" % (row[0]))
+        logger.info("当月总上行流量：%s" % (humanize.naturalsize(row[0], binary=True)))
+        logger.info("当月总下行流量：%s" % (humanize.naturalsize(row[1], binary=True)))
         if row[0] > uploadLimitEveryMonth:
             return True
 
