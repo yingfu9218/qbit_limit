@@ -23,3 +23,10 @@ vim config.py 修改qbittorrent账号信息和上行限制配置
 python3 qbit_limit.py
 
 ```
+
+
+查看每天日志
+```
+python3 logs.py
+
+```

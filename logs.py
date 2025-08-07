@@ -13,8 +13,8 @@ if __name__ == '__main__':
     # 判断是否存在记录
     logs = c.execute("select id,day_time,upload,down,deny_limit,created_at,updated_at from log  order by id desc  limit 30 " )
     rows = c.fetchall()
-    table = PrettyTable(['id', 'day_time', 'upload', 'down','deny_limit','created_at','updated_at'])
+    table = PrettyTable([ '日期', '上传', '下载','是否触发限速','创建时间','更新时间'])
     for row in rows:
-        table.add_row([row[0],row[1],humanize.naturalsize(row[2], binary=True), humanize.naturalsize(row[3], binary=True),row[4],row[5],row[6]])
+        table.add_row([row[1],humanize.naturalsize(row[2], binary=True), humanize.naturalsize(row[3], binary=True),row[4],row[5],row[6]])
 
     print(table)
