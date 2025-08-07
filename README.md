@@ -25,7 +25,7 @@ python3 qbit_limit.py
 ```
 
 
-查看每天日志
+查看每天日志(近30天)
 ```
 python3 logs.py
 
