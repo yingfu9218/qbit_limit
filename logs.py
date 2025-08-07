@@ -3,6 +3,7 @@ import sqlite3
 from loguru import logger
 import humanize
 from prettytable import PrettyTable
+from datetime import datetime
 
 
 dbPath = os.path.dirname(os.path.abspath(__file__))
@@ -18,3 +19,15 @@ if __name__ == '__main__':
         table.add_row([row[1],humanize.naturalsize(row[2], binary=True), humanize.naturalsize(row[3], binary=True),row[4],row[5],row[6]])
 
     print(table)
+
+    # 本月总流量
+
+    monthFirstDay = datetime.now().strftime("%Y-%m-01")
+    today = datetime.now().strftime("%Y-%m-%d")
+    c.execute(
+        "select sum(upload),sum(down) from log where day_time BETWEEN '%s' and '%s'  limit 1" % (monthFirstDay, today))
+    row = c.fetchone()
+    if row[0] != None:
+        print("当月总上行流量：%s" % (humanize.naturalsize(row[0], binary=True)))
+        print("当月总下行流量：%s" % (humanize.naturalsize(row[1], binary=True)))
+
