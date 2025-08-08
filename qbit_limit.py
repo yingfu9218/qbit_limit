@@ -95,14 +95,26 @@ def updateLog():
             # if row[6] == 0:
             denyUpload(up_rate_limit)
 
+        if total_upload >= row[2]:
+            c.execute(
+                "UPDATE log  set upload=%d,down=%d,deny_limit=%d,updated_at='%s' where day_time='%s' " % (upload,
+                                                                                                          down,
+                                                                                                          deny_limit,
+                                                                                                          now, today))
+            conn.commit()
+            logger.info("更新今天数据：upload:%d,down:%d,deny_limit:%d,updated_at=%s" % (upload, down, deny_limit, now))
+        else:
+            # 如果总上行变小（qbit数据被重置过），则更新total_upload_first和total_download_first
+            c.execute(
+                "UPDATE log  set total_upload_first=%d,total_download_first=%d,upload=%d,down=%d,deny_limit=%d,updated_at='%s' where day_time='%s' " % (total_upload,total_download,upload,
+                                                                                                          down,
+                                                                                                          deny_limit,
+                                                                                                          now, today))
+            conn.commit()
+            logger.info("更新今天数据：total_upload_first:%d,total_download_first:%d,upload:%d,down:%d,deny_limit:%d,updated_at=%s" % (total_upload,total_download,upload, down, deny_limit, now))
 
-        c.execute(
-            "UPDATE log  set upload=%d,down=%d,deny_limit=%d,updated_at='%s' where day_time='%s' " % (upload,
-                                                                                                              down,
-                                                                                                              deny_limit,
-                                                                                                              now,today))
-        conn.commit()
-        logger.info("更新今天数据：upload:%d,down:%d,deny_limit:%d,updated_at=%s" % (upload, down, deny_limit, now))
+
+
         logger.info("今天上行流量：%s" % (humanize.naturalsize(upload, binary=True)))
         logger.info("今天下行流量：%s" % (humanize.naturalsize(down, binary=True)))
 
