@@ -27,6 +27,7 @@ python3 qbit_limit.py
 
 查看每天日志(近30天)
 ```
-python3 logs.py
+命令行方式：python3 logs.py
+页面方式： 访问http://localhost:8091
 
 ```
