@@ -250,9 +250,10 @@ def isMonthUploadOver():
 # Flask路由
 @app.route('/')
 def index():
+    c2=conn.cursor()
     # 获取最近30天的日志记录
-    logs = c.execute("select id,day_time,upload,down,deny_limit,created_at,updated_at from log order by id desc limit 30")
-    rows = c.fetchall()
+    logs = c2.execute("select id,day_time,upload,down,deny_limit,created_at,updated_at from log order by id desc limit 30")
+    rows = c2.fetchall()
     
     # 格式化数据
     formatted_logs = []
@@ -269,9 +270,9 @@ def index():
     # 获取当月总流量
     monthFirstDay = datetime.now().strftime("%Y-%m-01")
     today = datetime.now().strftime("%Y-%m-%d")
-    c.execute(
+    c2.execute(
         "select sum(upload),sum(down) from log where day_time BETWEEN '%s' and '%s' limit 1" % (monthFirstDay, today))
-    month_row = c.fetchone()
+    month_row = c2.fetchone()
     
     month_upload = "0 B"
     month_download = "0 B"
