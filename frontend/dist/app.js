@@ -221,8 +221,8 @@ async function init() {
     }
 }
 
-// Auto refresh every 10 seconds
-setInterval(init, 10000);
+// Auto refresh every 60 seconds
+setInterval(init, 60000);
 
 // Initial load
 init();
