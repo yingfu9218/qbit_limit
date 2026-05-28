@@ -3,83 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>流量统计查看</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>流量统计 · qbit_limit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="header-content">
-            <div class="header-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-                </svg>
+    <!-- Top nav -->
+    <nav class="top-nav">
+        <div class="top-nav-inner">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    </svg>
+                </span>
+                <span class="brand-word">qbit_limit</span>
             </div>
-            <h1>流量统计查看</h1>
+            <div class="nav-meta">
+                <span class="product-pill">Traffic Monitor</span>
+            </div>
         </div>
-    </div>
+    </nav>
 
-    <div class="container">
-        <!-- Current Month Statistics -->
-        <div class="section">
-            <h2 class="section-title">
-                <span class="title-indicator"></span>
-                当月总流量统计
-            </h2>
-            
+    <main class="container">
+        <!-- Hero -->
+        <header class="hero">
+            <div class="eyebrow">Bandwidth Control</div>
+            <h1 class="display">qBittorrent 上行流量守门员</h1>
+            <p class="subhead">监控每日 / 每月上行用量，达到阈值自动压速。下方为当月汇总与最近 30 天明细。</p>
+        </header>
+
+        <!-- Current month -->
+        <section class="section">
+            <div class="section-head">
+                <span class="eyebrow">Current Month</span>
+                <h2 class="headline">当月总流量统计</h2>
+            </div>
+
             <div class="stats-grid">
-                <!-- Upload Card -->
-                <div class="stat-card upload-card">
-                    <div class="stat-header">
-                        <div class="stat-icon upload-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <article class="stat-card stat-card--upload">
+                    <div class="stat-card-row">
+                        <span class="stat-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <polyline points="16 12 12 8 8 12"></polyline>
                                 <line x1="12" y1="16" x2="12" y2="8"></line>
                             </svg>
-                        </div>
-                        <span class="stat-label desktop-only">当月总上行流量</span>
-                        <span class="stat-label mobile-only">总上行</span>
+                        </span>
+                        <span class="stat-label">当月总上行流量</span>
                     </div>
                     <div class="stat-value" id="month-upload">0 B</div>
-                </div>
+                    <div class="stat-foot">Upload · Terraform identity</div>
+                </article>
 
-                <!-- Download Card -->
-                <div class="stat-card download-card">
-                    <div class="stat-header">
-                        <div class="stat-icon download-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <article class="stat-card stat-card--download">
+                    <div class="stat-card-row">
+                        <span class="stat-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <polyline points="8 12 12 16 16 12"></polyline>
                                 <line x1="12" y1="8" x2="12" y2="16"></line>
                             </svg>
-                        </div>
-                        <span class="stat-label desktop-only">当月总下行流量</span>
-                        <span class="stat-label mobile-only">总下行</span>
+                        </span>
+                        <span class="stat-label">当月总下行流量</span>
                     </div>
                     <div class="stat-value" id="month-download">0 B</div>
-                </div>
+                    <div class="stat-foot">Download · Waypoint identity</div>
+                </article>
             </div>
-        </div>
+        </section>
 
-        <!-- Recent 30 Days Records -->
-        <div class="section">
-            <h2 class="section-title">
-                <span class="title-indicator"></span>
-                最近30天流量记录
-            </h2>
+        <!-- Recent 30 days -->
+        <section class="section">
+            <div class="section-head">
+                <span class="eyebrow">Last 30 Days</span>
+                <h2 class="headline">最近 30 天流量记录</h2>
+            </div>
 
             <div class="scroll-area" id="logs-container">
                 <div class="logs-list" id="logs-list">
-                    <!-- Logs will be inserted here -->
+                    <!-- Logs will be inserted here by app.js -->
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <script src="app.js?v=3"></script>
+    <footer class="footer">
+        <div class="footer-inner">
+            <span class="footer-word">qbit_limit</span>
+            <span class="footer-meta">每 60 秒自动刷新 · Flask + SQLite</span>
+        </div>
+    </footer>
+
+    <script src="app.js?v=4"></script>
 </body>
 </html>
-
