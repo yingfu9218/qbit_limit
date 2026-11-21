@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>QBit Limit · 上行流量守卫</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Desktop Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand-header">
+          <div class="brand-left">
+            <div class="logo-mark" aria-hidden="true">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            </div>
+            <div class="brand-titles">
+              <div class="app-name">QBit Limit</div>
+              <div class="app-sub">上行流量守卫</div>
+            </div>
+          </div>
+          <span class="version-pill">Go v2</span>
+        </div>
+
+        <nav class="nav-section" aria-label="主导航">
+          <div class="nav-group-label">主导航</div>
+          <button class="nav-item active" data-view="dashboard">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+            <span>监控概览</span>
+          </button>
+          <button class="nav-item" data-view="history">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+            <span>历史明细</span>
+          </button>
+          <button class="nav-item" data-view="logs">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M15 8h-5"/><path d="M15 12h-5"/></svg>
+            <span>运行日志</span>
+          </button>
+          <button class="nav-item" data-view="settings">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>系统配置</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-tools">
+          <button class="theme-toggle-btn" id="theme-toggle-desktop" title="切换深色/浅色主题">
+            <span class="theme-icon" id="theme-icon-desktop"></span>
+            <span id="theme-label-desktop">深色模式</span>
+          </button>
+          <button class="logout-btn hidden" id="btn-logout" title="退出管理登录">退出</button>
+        </div>
+
+        <div class="conn-card">
+          <div class="conn-top">
+            <div class="conn-status">
+              <span class="status-dot" id="sb-dot"></span>
+              <span class="conn-label" id="sb-conn-text">连接检测中...</span>
+            </div>
+            <span class="conn-latency" id="sb-latency">--</span>
+          </div>
+          <div class="conn-meta" id="sb-host">未配置地址</div>
+          <div class="conn-divider"></div>
+          <div class="conn-footer">
+            <span id="sb-poll">轮询 10s</span>
+            <span>SQLite 本地库</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Sticky Topbar -->
+    <header class="mobile-header">
+      <div class="mobile-brand">
+        <div class="logo-mark sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        </div>
+        <div>
+          <div class="app-name">QBit Limit</div>
+          <div class="mobile-conn" id="m-conn-text">检测中...</div>
+        </div>
+      </div>
+      <div class="mobile-actions">
+        <span class="pill pill-emerald" id="m-speed-pill">--</span>
+        <button class="icon-btn" id="theme-toggle-mobile" aria-label="切换主题"></button>
+        <button class="icon-btn" id="btn-sync-mobile" aria-label="立即同步">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <!-- Connection Alert Banner -->
+      <div class="alert-banner hidden" id="global-error-banner">
+        <div class="alert-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="global-error-text"></span>
+        </div>
+        <button class="btn btn-sm btn-secondary" data-jump="settings">前往配置</button>
+      </div>
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section class="view-section" id="view-dashboard">
+        <div class="top-bar">
+          <div class="title-block">
+            <h1>监控概览</h1>
+            <p class="subtitle" id="dash-subtitle">实时监控 qBittorrent 日/月上行配额与限速策略</p>
+          </div>
+          <div class="top-actions">
+            <span class="pill pill-emerald" id="dash-mode-pill">
+              <span class="dot"></span>
+              <span id="dash-mode-text">检测中</span>
+            </span>
+            <button class="btn btn-danger-soft" id="btn-manual-deny">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
+              <span id="btn-manual-deny-text">手动熔断限速</span>
+            </button>
+            <button class="btn btn-primary" id="btn-sync">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+              <span>立即同步</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-title-row">
+                <div class="kpi-icon primary">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>
+                </div>
+                <span class="kpi-label">今日上行流量</span>
+              </div>
+              <span class="pill pill-primary" id="kpi-day-pct">0%</span>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-day-up">0 B</span>
+              <span class="kpi-sub" id="kpi-day-limit">/ 20 GiB</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill primary" id="kpi-day-bar" style="width:0%"></div></div>
+            <div class="kpi-footer">
+              <span>今日剩余额度</span>
+              <strong id="kpi-day-rem">--</strong>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-title-row">
+                <div class="kpi-icon indigo">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                </div>
+                <span class="kpi-label">本月总上行</span>
+              </div>
+              <span class="pill pill-indigo" id="kpi-month-pct">0%</span>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-month-up">0 B</span>
+              <span class="kpi-sub" id="kpi-month-limit">/ 600 GiB</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill indigo" id="kpi-month-bar" style="width:0%"></div></div>
+            <div class="kpi-footer">
+              <span id="kpi-month-days">距周期重置 -- 天</span>
+              <strong id="kpi-month-rem">--</strong>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-title-row">
+                <div class="kpi-icon emerald">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <span class="kpi-label">实时传输速率</span>
+              </div>
+              <span class="pill pill-emerald" id="kpi-speed-badge">在线</span>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-up-speed">↑ 0 B/s</span>
+              <span class="kpi-sub" id="kpi-down-speed">↓ 0 B/s</span>
+            </div>
+            <div class="kpi-spacer"></div>
+            <div class="kpi-footer">
+              <span>当前生效上行限速</span>
+              <strong id="kpi-cur-limit">--</strong>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-title-row">
+                <div class="kpi-icon neutral">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
+                </div>
+                <span class="kpi-label">本月总下行</span>
+              </div>
+              <span class="pill pill-amber" id="kpi-limited-days">限速 0 天</span>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-month-down">0 B</span>
+              <span class="kpi-sub" id="kpi-share-ratio">分享率 --</span>
+            </div>
+            <div class="kpi-spacer"></div>
+            <div class="kpi-footer">
+              <span>今日下行流量</span>
+              <strong id="kpi-day-down">0 B</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trend Chart Card -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <div class="chart-header-left">
+              <h2 id="chart-title">近 14 天流量趋势</h2>
+              <div class="chart-legend">
+                <span class="legend-item"><i class="swatch up"></i>上行流量</span>
+                <span class="legend-item"><i class="swatch over"></i>触发限速</span>
+                <span class="legend-item"><i class="swatch down"></i>下行流量</span>
+                <span class="legend-item"><i class="swatch-line"></i>日限额参考线</span>
+              </div>
+            </div>
+            <div class="segmented-tabs" id="chart-range-tabs">
+              <button class="seg-btn" data-days="7">7 天</button>
+              <button class="seg-btn active" data-days="14">14 天</button>
+              <button class="seg-btn" data-days="30">30 天</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div id="trend-chart"></div>
+            <div class="chart-tooltip hidden" id="chart-tooltip"></div>
+          </div>
+        </div>
+
+        <!-- Recent Records Table Card -->
+        <div class="card table-card">
+          <div class="card-header">
+            <div class="table-header-left">
+              <h2>最近流量记录</h2>
+              <div class="filter-pills" id="dash-filter-pills">
+                <button class="filter-pill active" data-limited="0">全部 (<span id="recent-total-count">0</span>)</button>
+                <button class="filter-pill" data-limited="1">仅看限速</button>
+              </div>
+            </div>
+            <button class="link-btn" data-jump="history">查看完整历史明细 →</button>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>当日上行</th>
+                  <th>日配额使用率</th>
+                  <th>当日下行</th>
+                  <th>限速状态</th>
+                  <th>最后同步时间</th>
+                </tr>
+              </thead>
+              <tbody id="recent-tbody">
+                <tr><td colspan="6" class="empty-cell">加载中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: HISTORY -->
+      <section class="view-section hidden" id="view-history">
+        <div class="top-bar">
+          <div class="title-block">
+            <h1>历史流量明细</h1>
+            <p class="subtitle">按月查看每日流量台账并支持一键导出 CSV 报表（完全兼容原 qb.db 历史记录）</p>
+          </div>
+          <div class="top-actions">
+            <div class="month-picker">
+              <button class="icon-btn-sm" id="btn-month-prev" title="上一个月">‹</button>
+              <select id="history-month-select" aria-label="选择月份"></select>
+              <button class="icon-btn-sm" id="btn-month-next" title="下一个月">›</button>
+            </div>
+            <button class="btn btn-secondary" id="btn-export-csv">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>导出 CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="summary-strip">
+          <div class="summary-item">
+            <span class="summary-label">当月总上行</span>
+            <strong class="summary-val primary" id="hist-sum-up">0 B</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">当月总下行</span>
+            <strong class="summary-val" id="hist-sum-down">0 B</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">日均上行流量</span>
+            <strong class="summary-val" id="hist-sum-avg">0 B</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">触发限速天数</span>
+            <strong class="summary-val rose" id="hist-sum-limited">0 天</strong>
+          </div>
+        </div>
+
+        <div class="card table-card">
+          <div class="card-header">
+            <div class="table-header-left">
+              <h2>每日流量台账</h2>
+              <div class="filter-pills" id="hist-filter-pills">
+                <button class="filter-pill active" data-limited="0">全部记录</button>
+                <button class="filter-pill" data-limited="1">仅触发限速</button>
+              </div>
+            </div>
+            <span class="muted-text" id="hist-count-label">共 0 条</span>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>当日上行</th>
+                  <th>当日下行</th>
+                  <th>限速触发状态</th>
+                  <th>首次采集时间</th>
+                  <th>最后更新时间</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr><td colspan="6" class="empty-cell">加载中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: LOGS / EVENTS -->
+      <section class="view-section hidden" id="view-logs">
+        <div class="top-bar">
+          <div class="title-block">
+            <h1>运行日志与限速事件</h1>
+            <p class="subtitle">记录限速触发、跨日恢复、配置变更与 qBittorrent 连接状态事件</p>
+          </div>
+          <div class="top-actions">
+            <div class="filter-pills" id="events-level-pills">
+              <button class="filter-pill active" data-level="ALL">全部</button>
+              <button class="filter-pill" data-level="ALERT">告警/异常</button>
+              <button class="filter-pill" data-level="INFO">常规</button>
+            </div>
+            <button class="btn btn-secondary" id="btn-refresh-events">刷新日志</button>
+          </div>
+        </div>
+
+        <div class="card table-card">
+          <div class="events-list" id="events-list">
+            <div class="empty-cell">加载中...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: SETTINGS -->
+      <section class="view-section hidden" id="view-settings">
+        <div class="top-bar">
+          <div class="title-block">
+            <h1>后台常规配置</h1>
+            <p class="subtitle">配置持久化在本地 SQLite 数据库，保存后即时热生效，无需重启服务</p>
+          </div>
+          <div class="top-actions">
+            <button class="btn btn-secondary" id="btn-reset-settings">重新加载</button>
+            <button class="btn btn-primary" id="btn-save-settings">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <span>保存并立即生效</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="settings-col-main">
+            <!-- qBittorrent Connection -->
+            <div class="card form-card">
+              <div class="form-card-head">
+                <div class="head-left">
+                  <div class="kpi-icon primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                  </div>
+                  <div>
+                    <h3>qBittorrent 连接配置</h3>
+                    <p>支持 HTTP / HTTPS WebUI 地址与会话自动续期</p>
+                  </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-test-qb">测试连接</button>
+              </div>
+              <div class="form-divider"></div>
+              <div class="form-field">
+                <label for="cfg-qb-host">服务地址 (Host)</label>
+                <input type="text" id="cfg-qb-host" placeholder="http://127.0.0.1:8080" />
+                <span class="helper-text">示例：http://127.0.0.1:8080 或 https://qb.example.com</span>
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label for="cfg-qb-user">WebUI 用户名</label>
+                  <input type="text" id="cfg-qb-user" placeholder="admin" />
+                </div>
+                <div class="form-field">
+                  <label for="cfg-qb-pass">WebUI 密码</label>
+                  <div class="input-with-action">
+                    <input type="password" id="cfg-qb-pass" placeholder="留空表示保持当前密码不变" autocomplete="new-password" />
+                    <button type="button" class="input-eye-btn" data-toggle-pass="cfg-qb-pass" title="显示/隐藏密码">◉</button>
+                  </div>
+                </div>
+              </div>
+              <div class="test-result-banner hidden" id="qb-test-result"></div>
+            </div>
+
+            <!-- Quota & Rate Limit Policy -->
+            <div class="card form-card">
+              <div class="form-card-head">
+                <div class="head-left">
+                  <div class="kpi-icon indigo">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                  </div>
+                  <div>
+                    <h3>流量配额与限速策略</h3>
+                    <p>超限后自动下调至熔断速率，跨日 / 跨周期自动恢复常规限速</p>
+                  </div>
+                </div>
+              </div>
+              <div class="form-divider"></div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label for="cfg-daily-val">每日最大上行流量</label>
+                  <div class="input-unit-group">
+                    <input type="number" id="cfg-daily-val" min="0" step="0.1" />
+                    <select id="cfg-daily-unit">
+                      <option value="MiB">MiB</option>
+                      <option value="GiB" selected>GiB</option>
+                      <option value="TiB">TiB</option>
+                    </select>
+                  </div>
+                  <span class="helper-text">填 0 表示不限制单日总流量</span>
+                </div>
+                <div class="form-field">
+                  <label for="cfg-monthly-val">每月最大上行流量</label>
+                  <div class="input-unit-group">
+                    <input type="number" id="cfg-monthly-val" min="0" step="1" />
+                    <select id="cfg-monthly-unit">
+                      <option value="GiB" selected>GiB</option>
+                      <option value="TiB">TiB</option>
+                    </select>
+                  </div>
+                  <span class="helper-text">填 0 表示不限制月度总流量</span>
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label for="cfg-normal-val">正常上行速率限制</label>
+                  <div class="input-unit-group">
+                    <input type="number" id="cfg-normal-val" min="0" step="0.1" />
+                    <select id="cfg-normal-unit">
+                      <option value="KiB">KiB/s</option>
+                      <option value="MiB" selected>MiB/s</option>
+                    </select>
+                  </div>
+                  <span class="helper-text">未超限时的常规速率（填 0 表示不限速）</span>
+                </div>
+                <div class="form-field">
+                  <label for="cfg-deny-val">超限熔断速率 (禁止上传)</label>
+                  <div class="input-unit-group">
+                    <input type="number" id="cfg-deny-val" min="1" step="1" />
+                    <select id="cfg-deny-unit">
+                      <option value="KiB" selected>KiB/s</option>
+                      <option value="MiB">MiB/s</option>
+                    </select>
+                  </div>
+                  <span class="helper-text">超限后设置的极低保活上传速率（默认 5 KiB/s）</span>
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label for="cfg-reset-day">月度统计重置日</label>
+                  <select id="cfg-reset-day"></select>
+                  <span class="helper-text">可根据运营商宽带账单日灵活调整（1-28日）</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-col-side">
+            <!-- General & Scheduler -->
+            <div class="card form-card">
+              <div class="form-card-head">
+                <div class="head-left">
+                  <div class="kpi-icon emerald">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <div>
+                    <h3>调度与常规设置</h3>
+                    <p>控制轮询频率、数据保留与运行开关</p>
+                  </div>
+                </div>
+              </div>
+              <div class="form-divider"></div>
+              <label class="toggle-row">
+                <div>
+                  <div class="toggle-title">启用自动限速监控</div>
+                  <div class="toggle-desc">关闭后仅统计流量，不再自动修改 qBittorrent 限速</div>
+                </div>
+                <input type="checkbox" class="switch-input" id="cfg-monitor-enabled" />
+              </label>
+              <div class="form-divider"></div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label for="cfg-poll-sec">轮询间隔 (秒)</label>
+                  <input type="number" id="cfg-poll-sec" min="3" max="3600" />
+                </div>
+                <div class="form-field">
+                  <label for="cfg-retention-days">日志保留 (天)</label>
+                  <input type="number" id="cfg-retention-days" min="7" max="3650" />
+                </div>
+              </div>
+              <label class="toggle-row">
+                <div>
+                  <div class="toggle-title">重启重置保护</div>
+                  <div class="toggle-desc">qBittorrent 重启计数归零时自动保留当日已统计流量</div>
+                </div>
+                <input type="checkbox" class="switch-input" id="cfg-restart-protect" />
+              </label>
+            </div>
+
+            <!-- Admin Security -->
+            <div class="card form-card">
+              <div class="form-card-head">
+                <div class="head-left">
+                  <div class="kpi-icon amber">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <div>
+                    <h3>管理访问保护</h3>
+                    <p>默认关闭以便局域网免密使用，可按需开启</p>
+                  </div>
+                </div>
+              </div>
+              <div class="form-divider"></div>
+              <label class="toggle-row">
+                <div>
+                  <div class="toggle-title">启用后台管理密码</div>
+                  <div class="toggle-desc">开启后修改配置或手动限速需验证密码</div>
+                </div>
+                <input type="checkbox" class="switch-input" id="cfg-auth-enabled" />
+              </label>
+              <div class="form-field" id="auth-pass-field">
+                <label for="cfg-auth-pass">后台访问密码</label>
+                <div class="input-with-action">
+                  <input type="password" id="cfg-auth-pass" placeholder="首次开启请设置密码，留空则保持原密码" autocomplete="new-password" />
+                  <button type="button" class="input-eye-btn" data-toggle-pass="cfg-auth-pass" title="显示/隐藏密码">◉</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Policy Preview -->
+            <div class="info-preview-card">
+              <div class="info-preview-head">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                <span>策略规则预览</span>
+              </div>
+              <ul id="policy-preview-list">
+                <li>加载中...</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Mobile Bottom Tab Bar -->
+    <nav class="mobile-tabbar" aria-label="移动端导航">
+      <button class="m-tab active" data-view="dashboard">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+        <span>概览</span>
+      </button>
+      <button class="m-tab" data-view="history">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+        <span>明细</span>
+      </button>
+      <button class="m-tab" data-view="logs">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/></svg>
+        <span>日志</span>
+      </button>
+      <button class="m-tab" data-view="settings">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>配置</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Admin Auth Modal -->
+  <div class="modal-backdrop hidden" id="auth-modal">
+    <div class="modal-card">
+      <h3>验证后台管理密码</h3>
+      <p>当前已开启后台访问保护，请输入管理密码以继续操作。</p>
+      <form id="auth-form">
+        <div class="form-field">
+          <input type="password" id="auth-modal-pass" placeholder="请输入管理密码" autocomplete="current-password" required />
+        </div>
+        <div class="modal-error hidden" id="auth-modal-err"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="auth-modal-cancel">取消</button>
+          <button type="submit" class="btn btn-primary">确认登录</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

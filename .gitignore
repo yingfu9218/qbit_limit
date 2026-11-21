@@ -1,0 +1,7 @@
+dist/
+qbit_limit
+qbit_limit.exe
+qb.db
+qb.db-shm
+qb.db-wal
+.DS_Store
